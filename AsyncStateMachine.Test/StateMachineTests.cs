@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 using AsyncStateMachine;
@@ -291,6 +292,64 @@ namespace AsyncStateMachine.Test
       sm.Fire("T1");
       //should be able to fire in state S2 as its super state is S1
       Assert.IsTrue(sm.CanFire("T1"));
+    }
+
+    [TestMethod]
+    public async Task State_machine_traffic_robot()
+    {
+      //create a state machine to simulate a traffic robot in the Red state
+      StateMachine sm = new StateMachine("Red");
+
+      //configure the Red state permitting a RedToGreen trigger that changes state to Green
+      sm.Configure("Red")
+        .Permit("RedToGreen", "Green")
+        .AddEntryAction(() => Debug.WriteLine("Light has turned red"));
+
+      //configure the Green state by adding an async task to show how it can be invoked from FireAsync
+      sm.Configure("Green")
+        .AddAsyncEntryAction
+        (
+          async () =>
+          {
+            await Task.Yield();
+            Debug.WriteLine("Light has turned green after an async task");
+          }
+        );
+
+      await sm.FireAsync("RedToGreen");
+      
+      Assert.IsTrue(sm.State == "Green");
+
+      //prevent changing to Red from Green as we need to go to Amber first
+      sm.Configure("Green")
+        .Ignore("GreenToRed");
+
+      await sm.FireAsync("GreenToRed");
+
+      //trigger ignored and state still Green
+      Assert.IsTrue(sm.State == "Green");
+
+      //allow green to amber
+      sm.Configure("Green")
+        .Permit("GreenToAmber", "Amber");
+
+      //add an entry action for amber that simulates a delay and then just go straight to green with a continuation
+      sm.Configure("Amber")
+        .AddAsyncEntryAction
+        (
+          async () =>
+          {
+            await Task.Delay(500);
+            Debug.WriteLine("Light has turned amber after an async delay");
+          }
+        )
+        .Permit("AmberToRed", "Red")
+        .Continue(ContinuationOption.Succeed, "AmberToRed");
+
+      await sm.FireAsync("GreenToAmber");
+
+      //we gone right from Green to Amber to Red by firing a single trigger (the continuation allows this)
+      Assert.IsTrue(sm.State == "Red");
     }
 
     private StateMachine CreateStateMachine(string initialState)
