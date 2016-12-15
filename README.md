@@ -3,17 +3,17 @@ Credit: Some of this code was inspired by Stateless, a state machine implementat
 # AsyncStateMachine<br />
 <br />
 State machine supporting the async operator<br />
-See units tests for useage i.e. how to set up guards and triggers.<br />
+See units tests for useage i.e. how to set up states, guards and triggers.<br />
 
 Example:<br />
 
 //create a state machine to simulate a traffic robot in the Red state<br />
 StateMachine sm = new StateMachine("Red");<br />
 
-//configure the Red state permitting a RedToGreen trigger that changes state to Green<br />
+//configure the Red state by adding an entry action and permitting a RedToGreen trigger that changes state to Green<br />
 sm.Configure("Red")<br />
-  .Permit("RedToGreen", "Green")<br />
-  .AddEntryAction(() => Debug.WriteLine("Light has turned red"));<br />
+  .AddEntryAction(() => Debug.WriteLine("Light has turned red"))
+  .Permit("RedToGreen", "Green")<br />;<br />
 
 //configure the Green state by adding an async task to show how it can be invoked from FireAsync<br />
 sm.Configure("Green")<br />
