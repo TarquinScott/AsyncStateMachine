@@ -43,7 +43,10 @@ Assert.IsTrue(sm.State == "Green");<br />
 sm.Configure("Green")<br />
   .Permit("GreenToAmber", "Amber");<br />
 
-//add an entry action for Amber that simulates a delay and then goes straight to Green with a continuation. The continuation fires a //trigger based on an option such as Succeed or Fail. It allows chaining of triggers so that firing one trigger results in several being //fired (this can be important in code where access to the state machine is not possible but states need to be flowed one into the //other).<br />
+//add an entry action for Amber that simulates a delay and then goes straight to Green with a continuation.<br />
+//The continuation fires a trigger based on an option such as Succeed or Fail.<br />
+//It allows chaining of triggers so that firing one trigger results in several being fired<br />
+//This can be important in code where access to the state machine is not possible but states need to be flowed one into the other).<br />
 
 sm.Configure("Amber")<br />
   .AddAsyncEntryAction<br />
