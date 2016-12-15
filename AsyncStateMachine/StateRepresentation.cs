@@ -73,15 +73,13 @@ namespace AsyncStateMachine
     public bool IsIgnored(string trigger)
     {
       TriggerBehaviour triggerBehaviour = GetTriggerBehaviour(trigger);
-      return triggerBehaviour != null ? !triggerBehaviour.AllowTransition : false;
+      return !triggerBehaviour?.AllowTransition ?? false;
     }
 
     private TriggerBehaviour GetTriggerBehaviour(string trigger)
     {
-      var triggers = from t in _triggers
-                     where t.Trigger == trigger
-                     && t.IsGuardConditionMet
-                     select t;
+
+      var triggers = _triggers.Where(t => t.Trigger == trigger && t.IsGuardConditionMet);
 
       if (triggers.Count() > 1)
       {
@@ -98,10 +96,7 @@ namespace AsyncStateMachine
 
     private ContinuationBehaviour GetContinuationBehaviour(ContinuationOption option)
     {
-      var continuations = from c in _continuations
-                     where c.Option == option
-                     && c.IsGuardConditionMet
-                     select c;
+      var continuations = _continuations.Where(c => c.Option == option && c.IsGuardConditionMet);
 
       if (continuations.Count() > 1)
       {
@@ -113,9 +108,7 @@ namespace AsyncStateMachine
 
     private IEnumerable<ContinuationAction> GetContinuationActions(ContinuationOption option)
     {
-      var actions = from c in _continuationActions
-                          where c.Option == option
-                          select c;
+      var actions = _continuationActions.Where(c => c.Option == option);
 
       return actions;
     }
@@ -148,7 +141,10 @@ namespace AsyncStateMachine
 
     public void Enter()
     {
-      if (_asyncEntryActions.Any()) throw new InvalidOperationException("Cannot enter sync with async entry actions configured");
+      if (_asyncEntryActions.Any())
+      {
+        throw new InvalidOperationException("Cannot enter sync with async entry actions configured");
+      }
 
       foreach (Action action in _entryActions)
       {
@@ -158,7 +154,10 @@ namespace AsyncStateMachine
     
     public void Exit()
     {
-      if (_asyncExitActions.Any()) throw new InvalidOperationException("Cannot exit sync with async exit actions configured");
+      if (_asyncExitActions.Any())
+      {
+        throw new InvalidOperationException("Cannot exit sync with async exit actions configured");
+      }
 
       foreach (Action action in _exitActions)
       {
