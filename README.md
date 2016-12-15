@@ -12,8 +12,8 @@ StateMachine sm = new StateMachine("Red");<br />
 
 //configure the Red state by adding an entry action and permitting a RedToGreen trigger that changes state to Green<br />
 sm.Configure("Red")<br />
-  .AddEntryAction(() => Debug.WriteLine("Light has turned red"))
-  .Permit("RedToGreen", "Green")<br />;<br />
+  .AddEntryAction(() => Debug.WriteLine("Light has turned red"))<br />
+  .Permit("RedToGreen", "Green");<br />
 
 //configure the Green state by adding an async task to show how it can be invoked from FireAsync<br />
 sm.Configure("Green")<br />
