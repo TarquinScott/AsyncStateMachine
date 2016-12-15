@@ -1,3 +1,4 @@
+Credit: Some of this code was inspired by Stateless, a state machine implementation by Nicholas Blumhardt. I built on the original concept by adding async support and continuations. I also vastly simplified the implementation to make it easier to understand for simple use cases. None of this code was ported from Stateless and is a complete re-write.
 
 # AsyncStateMachine<br />
 <br />
